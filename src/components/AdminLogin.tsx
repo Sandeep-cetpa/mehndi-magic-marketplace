@@ -1,29 +1,33 @@
 
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
-import { supabase } from '@/lib/supabase';
+import { loginUser } from '@/services/authService';
 
 const AdminLogin = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
     try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password
-      });
+      const response = await loginUser({ email, password });
 
-      if (error) throw error;
+      if (!response.success) {
+        throw new Error(response.message);
+      }
+      
+      // Store user session in localStorage
+      localStorage.setItem('user', JSON.stringify(response.user));
       
       toast({
         title: "Login successful",
@@ -31,7 +35,7 @@ const AdminLogin = () => {
       });
       
       // Redirect to admin dashboard
-      window.location.href = '/admin/dashboard';
+      navigate('/admin/dashboard');
     } catch (error) {
       if (error instanceof Error) {
         toast({

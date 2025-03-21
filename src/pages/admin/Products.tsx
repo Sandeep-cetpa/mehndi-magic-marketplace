@@ -1,7 +1,5 @@
-
 import { useState, useEffect } from 'react';
 import AdminLayout from '@/components/AdminLayout';
-import { supabase } from '@/lib/supabase';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -24,18 +22,10 @@ import {
 import { Label } from '@/components/ui/label';
 import { Pencil, Trash2, Plus } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
-
-type Product = {
-  id: string;
-  name: string;
-  description: string;
-  price: number;
-  image_url: string;
-  created_at: string;
-};
+import { getProducts, createProduct, updateProduct, deleteProduct, ProductType } from '@/services/productService';
 
 const Products = () => {
-  const [products, setProducts] = useState<Product[]>([]);
+  const [products, setProducts] = useState<ProductType[]>([]);
   const [loading, setLoading] = useState(true);
   const [newProduct, setNewProduct] = useState({
     name: '',
@@ -43,7 +33,7 @@ const Products = () => {
     price: '',
     image_url: '',
   });
-  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [editingProduct, setEditingProduct] = useState<ProductType | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const { toast } = useToast();
 
@@ -53,14 +43,8 @@ const Products = () => {
 
   const fetchProducts = async () => {
     try {
-      const { data, error } = await supabase
-        .from('products')
-        .select('*')
-        .order('created_at', { ascending: false });
-      
-      if (error) throw error;
-      
-      setProducts(data || []);
+      const data = await getProducts();
+      setProducts(data);
     } catch (error) {
       console.error('Error fetching products:', error);
       toast({
@@ -75,17 +59,12 @@ const Products = () => {
 
   const handleAddProduct = async () => {
     try {
-      const { error } = await supabase
-        .from('products')
-        .insert([{
-          name: newProduct.name,
-          description: newProduct.description,
-          price: parseFloat(newProduct.price),
-          image_url: newProduct.image_url,
-          created_at: new Date().toISOString(),
-        }]);
-      
-      if (error) throw error;
+      await createProduct({
+        name: newProduct.name,
+        description: newProduct.description,
+        price: parseFloat(newProduct.price),
+        image_url: newProduct.image_url,
+      });
       
       toast({
         title: "Success",
@@ -112,20 +91,15 @@ const Products = () => {
   };
 
   const handleUpdateProduct = async () => {
-    if (!editingProduct) return;
+    if (!editingProduct || !editingProduct.id) return;
     
     try {
-      const { error } = await supabase
-        .from('products')
-        .update({
-          name: editingProduct.name,
-          description: editingProduct.description,
-          price: parseFloat(editingProduct.price.toString()),
-          image_url: editingProduct.image_url,
-        })
-        .eq('id', editingProduct.id);
-      
-      if (error) throw error;
+      await updateProduct(editingProduct.id, {
+        name: editingProduct.name,
+        description: editingProduct.description,
+        price: editingProduct.price,
+        image_url: editingProduct.image_url,
+      });
       
       toast({
         title: "Success",
@@ -149,12 +123,7 @@ const Products = () => {
     if (!confirm('Are you sure you want to delete this product?')) return;
     
     try {
-      const { error } = await supabase
-        .from('products')
-        .delete()
-        .eq('id', id);
-      
-      if (error) throw error;
+      await deleteProduct(id);
       
       toast({
         title: "Success",

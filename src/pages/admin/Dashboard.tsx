@@ -1,20 +1,20 @@
-
 import { useEffect, useState } from 'react';
 import AdminLayout from '@/components/AdminLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { supabase } from '@/lib/supabase';
 import { 
   ShoppingBag, 
   Scissors, 
   CalendarDays, 
   Users, 
 } from 'lucide-react';
+import { getProducts } from '@/services/productService';
+import { getLeads } from '@/services/leadService';
 
 const Dashboard = () => {
   const [stats, setStats] = useState({
     products: 0,
-    services: 0,
-    workshops: 0,
+    services: 8, // Placeholder for now
+    workshops: 5, // Placeholder for now
     leads: 0,
   });
   const [loading, setLoading] = useState(true);
@@ -22,19 +22,17 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        // Here you would fetch actual data from your Supabase tables
-        // For now, we'll use placeholder values
+        // Fetch product count from MongoDB
+        const products = await getProducts();
         
-        // Example of how to fetch the count from a table
-        // const { count: productsCount } = await supabase
-        //   .from('products')
-        //   .select('*', { count: 'exact', head: true });
-
+        // Fetch leads from MongoDB
+        const leads = await getLeads();
+        
         setStats({
-          products: 12, // Placeholder
-          services: 8,  // Placeholder
-          workshops: 5, // Placeholder
-          leads: 24,    // Placeholder
+          products: products.length,
+          services: 8,  // Placeholder for now
+          workshops: 5, // Placeholder for now
+          leads: leads.length,
         });
       } catch (error) {
         console.error('Error fetching stats:', error);

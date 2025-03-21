@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -15,7 +14,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/components/ui/use-toast';
-import { supabase } from '@/lib/supabase';
+import { createLead } from '@/services/leadService';
 
 const formSchema = z.object({
   name: z.string().min(2, { message: 'Name must be at least 2 characters' }),
@@ -46,19 +45,14 @@ const ContactForm = () => {
     setLoading(true);
     
     try {
-      // Store the lead in Supabase
-      const { error } = await supabase
-        .from('leads')
-        .insert([{
-          name: values.name,
-          email: values.email,
-          phone: values.phone,
-          service: values.service,
-          message: values.message,
-          created_at: new Date().toISOString(),
-        }]);
-      
-      if (error) throw error;
+      // Create lead in MongoDB
+      await createLead({
+        name: values.name,
+        email: values.email,
+        phone: values.phone,
+        service: values.service,
+        message: values.message,
+      });
       
       toast({
         title: "Thank you!",
