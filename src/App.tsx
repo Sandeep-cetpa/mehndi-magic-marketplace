@@ -13,6 +13,11 @@ import Workshops from "./pages/Workshops";
 import Contact from "./pages/Contact";
 import NotFound from "./pages/NotFound";
 
+// Admin pages
+import AdminLogin from "./pages/admin/Login";
+import Dashboard from "./pages/admin/Dashboard";
+import AdminProducts from "./pages/admin/Products";
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -28,6 +33,12 @@ const App = () => (
           <Route path="/products" element={<Products />} />
           <Route path="/workshops" element={<Workshops />} />
           <Route path="/contact" element={<Contact />} />
+          
+          {/* Admin Routes */}
+          <Route path="/admin/login" element={<AdminLogin />} />
+          <Route path="/admin/dashboard" element={<Dashboard />} />
+          <Route path="/admin/products" element={<AdminProducts />} />
+          
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
