@@ -27,7 +27,7 @@ export async function connectToDatabase() {
   }
 }
 
-// Models
+// Define schemas
 const ProductSchema = new mongoose.Schema({
   name: { type: String, required: true },
   description: { type: String, required: true },
@@ -45,15 +45,13 @@ const LeadSchema = new mongoose.Schema({
   created_at: { type: Date, default: Date.now }
 });
 
-// Create models if they don't exist
-export const Product = mongoose.models.Product || mongoose.model('Product', ProductSchema);
-export const Lead = mongoose.models.Lead || mongoose.model('Lead', LeadSchema);
-
-// For user authentication
 const UserSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   created_at: { type: Date, default: Date.now }
 });
 
+// Create models using mongoose.models or model
+export const Product = mongoose.models.Product || mongoose.model('Product', ProductSchema);
+export const Lead = mongoose.models.Lead || mongoose.model('Lead', LeadSchema);
 export const User = mongoose.models.User || mongoose.model('User', UserSchema);
