@@ -42,7 +42,7 @@ export async function createLead(leadData: LeadType) {
 export async function getLeads() {
   try {
     await connectToDatabase();
-    const leads = await Lead.find({}).sort({ created_at: -1 });
+    const leads = await Lead.find().sort({ created_at: -1 }).exec();
     return leads.map(doc => ({
       id: doc._id.toString(),
       name: doc.name,

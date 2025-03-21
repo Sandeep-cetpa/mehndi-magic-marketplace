@@ -22,7 +22,7 @@ export async function createAdminUser(email: string, password: string) {
     await connectToDatabase();
     
     // Check if user already exists
-    const existingUser = await User.findOne({ email });
+    const existingUser = await User.findOne({ email }).exec();
     if (existingUser) {
       return {
         success: false,
@@ -64,7 +64,7 @@ export async function loginUser({ email, password }: LoginCredentials): Promise<
     await connectToDatabase();
     
     // Find user by email
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email }).exec();
     if (!user) {
       return {
         success: false,

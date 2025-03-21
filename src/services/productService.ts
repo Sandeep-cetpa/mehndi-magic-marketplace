@@ -13,7 +13,7 @@ export type ProductType = {
 export async function getProducts() {
   try {
     await connectToDatabase();
-    const products = await Product.find({}).sort({ created_at: -1 });
+    const products = await Product.find().sort({ created_at: -1 }).exec();
     return products.map(doc => ({
       id: doc._id.toString(),
       name: doc.name,
@@ -61,7 +61,7 @@ export async function updateProduct(id: string, productData: Partial<ProductType
       id,
       { ...productData },
       { new: true }
-    );
+    ).exec();
     
     if (!updatedProduct) {
       throw new Error("Product not found");
@@ -84,7 +84,7 @@ export async function updateProduct(id: string, productData: Partial<ProductType
 export async function deleteProduct(id: string) {
   try {
     await connectToDatabase();
-    const deletedProduct = await Product.findByIdAndDelete(id);
+    const deletedProduct = await Product.findByIdAndDelete(id).exec();
     
     if (!deletedProduct) {
       throw new Error("Product not found");
